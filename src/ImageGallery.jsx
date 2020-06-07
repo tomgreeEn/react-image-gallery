@@ -60,6 +60,7 @@ export default class ImageGallery extends React.Component {
       sizes: string,
     })).isRequired,
     showNav: bool,
+    customSrcAttrib: string,
     autoPlay: bool,
     lazyLoad: bool,
     infinite: bool,
@@ -114,6 +115,7 @@ export default class ImageGallery extends React.Component {
     onErrorImageURL: '',
     additionalClass: '',
     showNav: true,
+    customSrcAttrib: null,
     autoPlay: false,
     lazyLoad: false,
     infinite: true,
@@ -1260,11 +1262,26 @@ export default class ImageGallery extends React.Component {
     }
   }
 
+  setSrcOpts(item) {
+const srcOpts = {}
+
+if (customSrcAttrib) {
+  srcOpts[customSrcAttrib] = item.thumbnail
+} else {
+  srcOpts.src = item.thumbnail
+}
+return srcOpts;
+}
+
   renderItem(item) {
     const { isFullscreen } = this.state;
     const { onImageError } = this.props;
     const handleImageError = onImageError || this.handleImageError;
     const itemSrc = isFullscreen ? (item.fullscreen || item.original) : item.original;
+
+
+  const srcOpts = setSrcOpts(item)
+
 
     return (
       <div>
@@ -1285,15 +1302,15 @@ export default class ImageGallery extends React.Component {
                 ))
               }
               <img
+               {...srcOpts}
                 className="image-gallery-image"
                 alt={item.originalAlt}
-                src={itemSrc}
               />
             </picture>
           ) : (
             <img
+             {...srcOpts}
               className="image-gallery-image"
-              src={itemSrc}
               alt={item.originalAlt}
               srcSet={item.srcSet}
               sizes={item.sizes}
@@ -1319,14 +1336,17 @@ export default class ImageGallery extends React.Component {
     const { onThumbnailError } = this.props;
     const handleThumbnailError = onThumbnailError || this.handleImageError;
 
+
+const srcOpts = setSrcOpts(item)
+
     return (
       <div className="image-gallery-thumbnail-inner">
         <img
-          className="image-gallery-thumbnail-image"
-          src={item.thumbnail}
-          alt={item.thumbnailAlt}
-          title={item.thumbnailTitle}
-          onError={handleThumbnailError}
+          {...srcOpts}
+           className="image-gallery-thumbnail-image"
+   alt={item.thumbnailAlt}
+  title={item.thumbnailTitle}
+   onError={handleThumbnailError}
         />
         {
           item.thumbnailLabel && (
